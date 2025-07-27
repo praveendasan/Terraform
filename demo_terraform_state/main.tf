@@ -4,12 +4,10 @@ region = "ap-southeast-1"
 
 #create a s3 bucket to store terraform state
 resource "aws_s3_bucket" "terrraform_bucket_state" {
-  bucket = "terraform-up-and-running-state"
-  
+  bucket = "terraform-up-and-running-state-praveendasan"
+  force_destroy = true # This is to ensure the bucket can be deleted if needed
   #prevent deletion of the bucket
-  lifecycle {
-    prevent_destroy = true
-  }
+
 }
 
 # Enable versioning for the S3 bucket
@@ -51,3 +49,30 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
     }
 }
 
+#add the backend configuration to the main.tf file
+#before deleting the backend configuration, make sure to run `terraform init -migrate-state` to migrate the state to the new backend
+/*
+terraform {
+  backend "s3" {
+    bucket = "terraform-up-and-running-state-praveendasan"
+    key            = "terraform.tfstate"
+    region         = "ap-southeast-1"
+    #dynamodb_table = "terraform-up-and-running-lock"
+    use_lockfile = false
+    encrypt        = true
+  }
+}
+*/
+
+
+output "s3_bucket_arn" {
+  value = aws_s3_bucket.terrraform_bucket_state.arn
+  description = "The ARN of the S3 bucket used for Terraform state storage"
+  
+}
+
+output "dynamodb_table_name" {
+  value = aws_dynamodb_table.terraform_state_lock.name
+  description = "The name of the DynamoDB table used for state locking"
+  
+}
