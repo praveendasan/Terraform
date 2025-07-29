@@ -7,15 +7,10 @@ resource "aws_launch_template" "example" {
   instance_type = "t3.micro"
   //subnet_id = aws_subnet.sbn_instance.id
   
-  user_data = base64encode(<<-EOF
-             #!/bin/bash
-              yum update -y
-              yum install -y busybox
-              mkdir -p /www
-              echo "<h1>Hello from BusyBox on port 8080!</h1>" > /www/index.html
-              busybox httpd -f -p 8080 -h /www &
-              EOF 
-  )
+  user_data = base64encode(templatefile("user-data.sh", {
+    server_port = var.server_port   # Use the variable defined in variables.tf
+  }))
+
   network_interfaces {
     security_groups = [aws_security_group.sg_instance.id]
   }
