@@ -30,7 +30,7 @@ resource "aws_autoscaling_group" "autoscalegrp_instance" {
   //launch_configuration = aws_launch_configuration.example.id
   min_size = 2
   max_size = 10
-  vpc_zone_identifier = [data.aws_subnet.custom_data_subnet.id]
+  vpc_zone_identifier = [aws_subnet.sbn_instance.id, aws_subnet.sbn_instance_2.id]
   target_group_arns = [aws_lb_target_group.aws_lb_target_group_instance.arn]
   health_check_type = "EC2"
   launch_template {
@@ -54,6 +54,7 @@ resource "aws_vpc" "vp_instance" {
 resource "aws_subnet" "sbn_instance" {
   vpc_id            = aws_vpc.vp_instance.id
   cidr_block        = "10.0.0.0/24"
+  availability_zone       = "ap-southeast-1a" # Specify the availability zone
   map_public_ip_on_launch = true
 }
 
@@ -98,6 +99,7 @@ data "aws_vpc" "custom_data_vpc" {
     id = aws_vpc.vp_instance.id
 }
 
+/*
 data "aws_subnet" "custom_data_subnet" {
 
     filter {
@@ -109,6 +111,7 @@ data "aws_subnet" "custom_data_subnet" {
     values = ["10.0.0.0/24"]
   }
 }
+*/
 
 #load balancer
 resource "aws_lb" "lb_instance" {
@@ -195,16 +198,8 @@ resource "aws_lb_listener_rule" "ags" {
 
 
 
-output "alb_dns_name" {
-  value = aws_lb.lb_instance.dns_name   
-  
-}
 
-variable "server_port" {
-  description = "The port on which the server will run"
-  type        = number
-  default     = 8080
-  
-}
+
+
 
 
