@@ -3,7 +3,8 @@ region = "ap-southeast-1"
 }
 
 module "module_webserver_cluster" {
-  source = "../../../modules/services/webserver-cluster"
+  #source = "../../../modules/services/webserver-cluster"
+  source = "git@github.com:praveendasan/Terraform.git//demo_aws/modules/services/webserver-cluster?ref=v1.0.0"
 
   #assignment of variables
   cluster_name = "webservers-stage"
